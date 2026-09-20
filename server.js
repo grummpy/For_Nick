@@ -32,7 +32,7 @@ async function askOpenAI({ query, files = [] }) {
   return textFromResponse(await response.json());
 }
 
-http.createServer(async (req, res) => {
+const server = http.createServer(async (req, res) => {
   if (req.method === 'POST' && req.url === '/api/query') {
     let raw = '';
     req.on('data', chunk => { raw += chunk; if (raw.length > 1_000_000) req.destroy(); });
@@ -50,4 +50,22 @@ http.createServer(async (req, res) => {
   if (path.startsWith('..')) return res.writeHead(403).end('Forbidden');
   try { const file = join(root, path); await stat(file); res.writeHead(200, { 'Content-Type': type[extname(file)] || 'application/octet-stream' }); createReadStream(file).pipe(res); }
   catch { res.writeHead(404).end('Not found'); }
-}).listen(port, () => console.log(`For Nick is ready at http://localhost:${port}`));
+});
+
+export function startServer() {
+  return new Promise((resolve, reject) => {
+    if (server.listening) return resolve(port);
+    server.once('error', reject);
+    server.listen(port, '127.0.0.1', () => {
+      server.off('error', reject);
+      console.log(`Purrplexity is ready at http://localhost:${port}`);
+      resolve(port);
+    });
+  });
+}
+
+export function stopServer() {
+  return new Promise(resolve => server.close(() => resolve()));
+}
+
+if (process.argv[1] && new URL(import.meta.url).pathname === process.argv[1]) startServer();

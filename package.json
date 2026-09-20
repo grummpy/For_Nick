@@ -1,0 +1,8 @@
+{
+  "name": "for-nick",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": { "dev": "node server.js", "start": "node server.js" },
+  "description": "A calm, file-aware OpenAI query workspace with a responsive cat companion."
+}

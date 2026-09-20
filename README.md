@@ -1,0 +1,32 @@
+# For Nick
+
+A deliberately simple, personal OpenAI query workspace with a responsive cat companion. It takes a typed, spoken, or file-supported question and sends it to the [OpenAI Responses API](https://platform.openai.com/docs/api-reference/responses).
+
+## Start locally
+
+1. Install Node.js 20 or newer.
+2. Copy `.env.example` to `.env` and add `OPENAI_API_KEY`.
+3. Run `npm run dev` and visit `http://localhost:3000`.
+
+Without an API key, the app runs in safe demo mode so the UI can be evaluated without sending anything.
+
+## Make a file-aware assistant
+
+1. In the OpenAI platform, create a Vector Store and upload the documents that should answer questions.
+2. Copy its ID into `OPENAI_VECTOR_STORE_ID` in `.env`.
+3. Restart the app. Each query now includes OpenAI's `file_search` tool against that knowledge collection.
+
+The file picker and drop zone currently stage filenames in the interface. Uploading new local files into OpenAI's Vector Store is intentionally a separate setup action, so the user explicitly chooses what leaves the device.
+
+## Interaction visual states
+
+- `assets/avatar/idle.png` — supplied reference / ready
+- `assets/avatar/listening.png` — typing and voice capture
+- `assets/avatar/searching.png` — request in progress
+- `assets/avatar/success.png` — reply received
+
+The three generated state assets were made with OpenAI image generation using the supplied cat as the continuity reference.
+
+## Architecture
+
+The browser only talks to the local Node server. The server holds the API key and makes the OpenAI request; no secret is embedded in the client.

@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>For Nick</title><link rel="stylesheet" href="styles.css"></head>
+<body><main class="app">
+  <header><div class="brand"><span class="dot"></span><div><small>PERSONAL AI WORKSPACE</small><strong>FOR NICK</strong></div></div><button id="setup">Setup guide</button></header>
+  <div class="layout">
+    <aside><div class="segmented"><button class="active" data-view="companion">Companion</button><button data-view="files">Files</button></div>
+      <section id="companion"><div class="avatar"><img id="avatar" src="assets/avatar/idle.png" alt="A friendly cat assistant ready to help"><span id="status">Ready when you are</span></div><small class="eyebrow">YOUR QUERY COMPANION</small><h1>Fix-It</h1><p>A calm, file-aware assistant. It listens while you type, researches while it works, and celebrates a useful result.</p><div class="states"><span>● Listening</span><span>● Searching</span><span>● Ready</span></div></section>
+      <section id="files" hidden><button class="new-file" id="addFiles">＋ Add files</button><input id="fileInput" type="file" multiple hidden><p class="hint">Drop a file in the center, or add it here. Connect it to OpenAI during setup to make it searchable.</p><div id="fileList"></div></section>
+    </aside>
+    <section class="workspace"><div class="route"><span><i></i> <b id="route">OpenAI workspace</b></span><button id="voice" aria-pressed="false">⌁ Voice</button></div><div id="conversation" aria-live="polite"><article class="welcome"><small>ASK ANYTHING</small><h2>What can we figure out?</h2><p>Type, talk, or drop in a file. Your query goes to your configured OpenAI knowledge assistant.</p></article></div>
+      <form id="queryForm"><div id="dropzone"><textarea id="query" placeholder="Ask a question, paste a brief, or drop in a file…" rows="4"></textarea><div id="pendingFiles"></div></div><div class="actions"><span>Enter to send · Shift+Enter for a new line</span><button class="send" type="submit">Ask Fix-It ↗</button></div></form>
+    </section>
+  </div>
+</main><dialog id="guide"><button class="close" id="closeGuide">×</button><small>FIVE-MINUTE SETUP</small><h2>Connect your OpenAI assistant</h2><ol><li>Copy <code>.env.example</code> to <code>.env</code>.</li><li>Add an API key from platform.openai.com.</li><li>Optional: create a Vector Store, upload your source files, then add its ID as <code>OPENAI_VECTOR_STORE_ID</code>.</li><li>Run <code>npm run dev</code> and open the local address.</li></ol><p>Your key stays on your machine and is never sent to the browser. Full details are in the README.</p></dialog><script src="app.js"></script></body></html>

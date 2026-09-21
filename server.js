@@ -2,6 +2,7 @@ import http from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { createReadStream } from 'node:fs';
 import { extname, join, normalize } from 'node:path';
+import { inspectSubmission } from './ferpa-guard.js';
 
 const root = process.cwd();
 try {
@@ -39,7 +40,18 @@ const server = http.createServer(async (req, res) => {
     req.on('end', async () => {
       try {
         const body = JSON.parse(raw || '{}');
-        if (!body.query?.trim()) throw new Error('Please enter a question.');
+        if (typeof body.query !== 'string' || !body.query.trim()) throw new Error('Please enter a question.');
+        const inspection = inspectSubmission(body);
+        if (inspection.blocked) {
+          console.info(`FERPA block: ${inspection.findings.map(finding => `${finding.type} x${finding.count}`).join(', ')}`);
+          res.writeHead(422, { 'Content-Type': 'application/json' }).end(JSON.stringify({
+            blocked: true,
+            title: inspection.title,
+            reason: inspection.reason,
+            findings: inspection.findings
+          }));
+          return;
+        }
         const answer = await askOpenAI(body);
         res.writeHead(200, { 'Content-Type': 'application/json' }).end(JSON.stringify({ answer, demo: !process.env.OPENAI_API_KEY }));
       } catch (error) { res.writeHead(400, { 'Content-Type': 'application/json' }).end(JSON.stringify({ error: error.message })); }

@@ -40,6 +40,22 @@ The three generated state assets were made with OpenAI image generation using th
 
 The browser only talks to the local Node server. The server holds the API key and makes the OpenAI request; no secret is embedded in the client.
 
+## FERPA prompt check
+
+Before a prompt is sent, the server scans the question and any staged file names for student information:
+
+- Student IDs, including labeled IDs and long ID-like numbers
+- Phone numbers
+- Email addresses
+- Social Security numbers
+- Dates of birth
+- Street addresses and P.O. boxes
+- Labeled student names
+
+If one of these is present, the prompt is blocked. Nothing is sent to OpenAI, the identifier is not stored, and a modal names what to remove. Acknowledge closes the modal. The prompt stays in the box so it can be edited and sent again.
+
+The check looks for identifiers. It does not keep a copy of the prompt, and it does not try to block a general discussion of coursework that does not identify a student.
+
 ## Build installers
 
 Run `npm install`, then:

@@ -7,6 +7,7 @@
   "author": "grummpy",
   "scripts": {
     "dev": "node server.js",
+    "test": "node --test",
     "start": "electron .",
     "package:mac": "electron-builder --mac dmg zip --arm64 && electron-builder --mac dmg zip --x64",
     "package:win": "electron-builder --win nsis portable --x64",

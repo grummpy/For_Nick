@@ -1,9 +1,9 @@
 import { app, BrowserWindow, shell } from 'electron';
+import { join } from 'node:path';
 import { startServer, stopServer } from './server.js';
 
 let window;
 const createWindow = async () => {
-  const port = await startServer();
   window = new BrowserWindow({
     width: 1280,
     height: 820,
@@ -12,10 +12,15 @@ const createWindow = async () => {
     title: 'Purrplexity',
     backgroundColor: '#050b16',
     autoHideMenuBar: true,
-    icon: process.platform === 'win32' ? 'build/icon.ico' : 'build/icon.icns',
+    icon: process.platform === 'win32' ? join(app.getAppPath(), 'build', 'icon.ico') : join(app.getAppPath(), 'build', 'icon.icns'),
     webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true }
   });
-  await window.loadURL(`http://127.0.0.1:${port}`);
+  try {
+    const port = await startServer();
+    await window.loadURL(`http://127.0.0.1:${port}`);
+  } catch (error) {
+    await window.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(`<main style="font-family:system-ui;background:#050b16;color:#eaf7ff;padding:40px"><h1>Purrplexity could not start</h1><p>${error.message}</p><p>Please reopen the app. If this keeps happening, send this message to support.</p></main>`)}`);
+  }
   window.webContents.setWindowOpenHandler(({ url }) => { shell.openExternal(url); return { action: 'deny' }; });
 };
 

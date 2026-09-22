@@ -9,6 +9,8 @@ Download the package matching your computer from the repository's **Releases** p
 - **macOS:** open `Purrplexity-*-arm64.dmg` on Apple Silicon Macs, or `Purrplexity-*-x64.dmg` on Intel Macs. Drag Purrplexity to Applications, then open it.
 - **Windows:** run `Purrplexity Setup *.exe`. The guided installer lets the user choose a location and creates Start Menu and Desktop shortcuts. `Purrplexity * portable.exe` runs without installing.
 
+For Windows, always use the file named **Purrplexity Setup … .exe** from the Releases page. It is the guided installer and creates the launcher automatically; the similarly named portable `.exe` does not install shortcuts.
+
 The macOS build is currently unsigned, so macOS may require Control-click → Open the first time. Signing and notarization require an Apple Developer certificate. The Windows installer is also unsigned until a code-signing certificate is supplied.
 
 ## Start locally

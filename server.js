@@ -1,9 +1,12 @@
 import http from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { createReadStream } from 'node:fs';
-import { extname, join, normalize } from 'node:path';
+import { extname, join, normalize, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const root = process.cwd();
+// In a packaged Electron app, process.cwd() is the folder where the shortcut was
+// launched, not the app bundle. Resolve assets from this source file instead.
+const root = process.env.PURRPLEXITY_APP_ROOT || dirname(fileURLToPath(import.meta.url));
 try {
   const env = await readFile(join(root, '.env'), 'utf8');
   for (const line of env.split(/\r?\n/)) {
@@ -11,7 +14,7 @@ try {
     if (match && !process.env[match[1]]) process.env[match[1]] = match[2].replace(/^['"]|['"]$/g, '');
   }
 } catch { /* .env is optional: demo mode remains available */ }
-const port = Number(process.env.PORT || 3000);
+const preferredPort = Number(process.env.PORT || 3000);
 const type = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.png': 'image/png', '.json': 'application/json; charset=utf-8' };
 
 function textFromResponse(response) {
@@ -54,13 +57,24 @@ const server = http.createServer(async (req, res) => {
 
 export function startServer() {
   return new Promise((resolve, reject) => {
-    if (server.listening) return resolve(port);
-    server.once('error', reject);
-    server.listen(port, '127.0.0.1', () => {
-      server.off('error', reject);
-      console.log(`Purrplexity is ready at http://localhost:${port}`);
-      resolve(port);
-    });
+    if (server.listening) return resolve(server.address().port);
+    const listen = port => {
+      const onError = error => {
+        server.off('error', onError);
+        // A local web server can already be using 3000. Pick a private free port
+        // rather than leaving the installed app with a blank window.
+        if (error.code === 'EADDRINUSE' && port !== 0) return listen(0);
+        reject(error);
+      };
+      server.once('error', onError);
+      server.listen(port, '127.0.0.1', () => {
+        server.off('error', onError);
+        const activePort = server.address().port;
+        console.log(`Purrplexity is ready at http://localhost:${activePort}`);
+        resolve(activePort);
+      });
+    };
+    listen(preferredPort);
   });
 }
 

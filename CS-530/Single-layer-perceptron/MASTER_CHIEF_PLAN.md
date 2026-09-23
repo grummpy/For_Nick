@@ -57,7 +57,7 @@ design and security lanes do not alter this local CLI deliverable.
 | Gate | Score | Evidence / corrective action |
 |---|---:|---|
 | Foundation Plan Gate | 88/100 | Scope, flow, source-linked guide, and risks are complete. |
-| Final Product Gate | 93/100 | Syntax check passed; small CSV run printed weights/bias/0.967 accuracy; full CSV run printed weights/bias/0.505 accuracy. |
+| Final Product Gate | 93/100 | Syntax check passed; small CSV run printed weights/bias/1.000 accuracy; full CSV run printed weights/bias/0.665 accuracy. |
 
 Rollback is `git revert <commit>`. A new dataset needs the same four columns or
 a deliberate helper/API change.

@@ -1,5 +1,6 @@
 """Train a single-layer perceptron on NBA game-result records."""
 
+import numpy as np
 import pandas as pd
 from sklearn.linear_model import Perceptron
 from sklearn.metrics import accuracy_score
@@ -21,18 +22,21 @@ y = NBA["game_result"].astype(int)
 scaler = StandardScaler()
 XScaled = scaler.fit_transform(X)
 
+# Match the assignment's specified deterministic training order.
+np.random.seed(42)
+
 # Split the data into training and test sets.
 XTrain, XTest, yTrain, yTest = train_test_split(
     XScaled, y, test_size=0.3, random_state=123
 )
 
 # Initialize and fit the requested perceptron.
-classifyNBA = Perceptron(eta0=0.05, max_iter=20000, random_state=42)
+classifyNBA = Perceptron(eta0=0.05, max_iter=20000)
 classifyNBA.fit(XTrain, yTrain)
 
 # Predict results and report the learned linear-model parameters.
 yPred = classifyNBA.predict(XTest)
-weightVar = classifyNBA.coef_[0]
+weightVar = classifyNBA.coef_
 weightBias = classifyNBA.intercept_
 print(weightVar)
 print(weightBias)

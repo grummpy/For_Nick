@@ -2,6 +2,8 @@
 
 A deliberately simple, personal OpenAI query workspace with a responsive cat companion. “Purrplexity” takes a typed, spoken, or file-supported question and sends it to the [OpenAI Responses API](https://platform.openai.com/docs/api-reference/responses).
 
+For the installed app, use the built-in **Setup guide** — users do not need an `.env` file. See [SETUP.md](SETUP.md) for the shareable installation guide.
+
 ## Install the desktop app
 
 Download the package matching your computer from the repository's **Releases** page.

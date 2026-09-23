@@ -9,4 +9,17 @@ $('#query').oninput = () => setState($('#query').value.trim() ? 'listening' : 'i
 $('#dropzone').ondragover = e => { e.preventDefault(); $('#dropzone').classList.add('over'); }; $('#dropzone').ondragleave = () => $('#dropzone').classList.remove('over'); $('#dropzone').ondrop = e => { e.preventDefault(); $('#dropzone').classList.remove('over'); addFiles(e.dataTransfer.files); };
 $('#queryForm').onsubmit = async e => { e.preventDefault(); const query = $('#query').value.trim(); if (!query) return; $('#conversation').insertAdjacentHTML('beforeend', `<article class="message user">${escapeHtml(query)}</article>`); $('#query').value = ''; setState('searching'); $('.send').disabled = true; try { const res = await fetch('/api/query', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({query, files: files.map(({name,size}) => ({name,size}))}) }); const data = await res.json(); if (!res.ok) throw new Error(data.error); $('#conversation').insertAdjacentHTML('beforeend', `<article class="message answer"><small>${data.demo ? 'DEMO MODE' : 'FIX-IT'}</small>${escapeHtml(data.answer)}</article>`); setState('success'); } catch (err) { $('#conversation').insertAdjacentHTML('beforeend', `<article class="message error">${escapeHtml(err.message)}</article>`); setState('idle'); } finally { $('.send').disabled = false; $('#conversation').scrollTop = $('#conversation').scrollHeight; } };
 $('#voice').onclick = () => { const recognition = window.SpeechRecognition || window.webkitSpeechRecognition; if (!recognition) return alert('Voice input is not available in this browser.'); const r = new recognition(); r.onstart = () => { $('#voice').textContent = '● Listening'; setState('listening'); }; r.onresult = e => { $('#query').value += ( $('#query').value ? ' ' : '') + e.results[0][0].transcript; }; r.onend = () => { $('#voice').textContent = '⌁ Voice'; setState('listening'); }; r.start(); };
-$('#setup').onclick = () => $('#guide').showModal(); $('#closeGuide').onclick = () => $('#guide').close(); function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; } drawFiles();
+async function showSetup() {
+  const guide = $('#guide'); const setupStatus = $('#setupStatus'); const bridge = window.purrplexity;
+  if (!bridge) { setupStatus.textContent = 'Browser development mode: copy .env.example to .env, add your key, then restart.'; $('#setupForm').hidden = true; }
+  else { const setup = await bridge.getSetupStatus(); setupStatus.textContent = setup.connected ? 'Connected. You can replace the saved key or update your Vector Store.' : 'Not connected yet. Add your API key below.'; $('#vectorStoreId').value = setup.vectorStoreId; $('#model').value = setup.model; $('#setupForm').hidden = false; }
+  guide.showModal();
+}
+$('#setup').onclick = showSetup; $('#closeGuide').onclick = () => $('#guide').close();
+$('#setupForm').onsubmit = async event => {
+  event.preventDefault(); const button = $('#saveSetup'); button.disabled = true; $('#setupResult').textContent = 'Saving securely…';
+  try { await window.purrplexity.saveSetup({ apiKey: $('#apiKey').value, vectorStoreId: $('#vectorStoreId').value, model: $('#model').value }); $('#apiKey').value = ''; $('#setupResult').textContent = 'Connected. Your next question will use your OpenAI account.'; $('#route').textContent = 'OpenAI connected'; }
+  catch (error) { $('#setupResult').textContent = error.message; } finally { button.disabled = false; }
+};
+function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; } drawFiles();
+if (window.purrplexity) window.purrplexity.getSetupStatus().then(setup => { if (!setup.connected) setTimeout(showSetup, 250); }).catch(() => {});

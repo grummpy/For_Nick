@@ -25,7 +25,15 @@ A key saved earlier with `safeStorage`, including an existing Mac setup, keeps w
 
 ### Upgrading from 1.0.2 or earlier
 
-Those Windows builds could hide the API key field or reject **Save & connect**. Install 1.0.3 over the old installer, or replace the old portable exe with the 1.0.3 portable build, then open **Setup guide** and save the key again. You do not need an `.env` file. If Setup guide says the setup bridge did not load, you are still on an older build.
+Those Windows builds could hide the API key field or reject **Save & connect**, and they do not update themselves. Install 1.0.3 over the old installer, or replace the old portable exe with the 1.0.3 portable build, then open **Setup guide** and save the key again. You do not need an `.env` file. If Setup guide says the setup bridge did not load, you are still on an older build. After 1.0.3 is installed with **Purrplexity Setup**, later versions can update from GitHub Releases inside the app.
+
+## Updates
+
+Installed Purrplexity does not update from a git clone or `git pull`. A few seconds after launch, and about every four hours after that, the packaged app checks [GitHub Releases](https://github.com/grummpy/For_Nick/releases) for a newer version. The download is quiet. When it is ready, a notice appears. Purrplexity does not restart in the middle of a question. Choose **Restart and install** when you are done, or quit the app and the update installs then. You do not need a GitHub token.
+
+- Use the **Windows Setup** installer (NSIS) if you want these updates. The portable `.exe` does not update itself; download a new portable build from Releases.
+- These builds are unsigned. Windows SmartScreen or a permission prompt can appear when the update installer runs. That is expected until a code-signing certificate is added. The app does not require the update to be signed, because no publisher certificate is configured yet.
+- macOS uses the same check. Applying the update needs an Apple-signed and notarized build. Until then, macOS can block the new copy, and the reliable path is still the `.dmg` or `.zip` on Releases (Control-click → Open the first time). Signing and notarization need an Apple Developer certificate.
 
 ## Optional: query a document collection
 

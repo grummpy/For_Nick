@@ -1,6 +1,6 @@
 {
   "name": "for-nick",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "private": false,
   "type": "module",
   "main": "electron-main.js",
@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "node server.js",
     "start": "electron .",
+    "test": "node --test --test-concurrency=1 settings-store.test.js",
     "package:mac": "electron-builder --mac dmg zip --arm64 && electron-builder --mac dmg zip --x64",
     "package:win": "electron-builder --win nsis portable --x64",
     "package:all": "npm run package:mac && npm run package:win"
@@ -29,7 +30,8 @@
       "**/*",
       "!release/**",
       "!.env",
-      "!launch-for-nick.command"
+      "!launch-for-nick.command",
+      "!**/*.test.js"
     ],
     "mac": {
       "target": [

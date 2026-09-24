@@ -9,7 +9,7 @@ For the installed app, use the built-in **Setup guide** — users do not need an
 Download the package matching your computer from the repository's **Releases** page.
 
 - **macOS:** open `Purrplexity-*-arm64.dmg` on Apple Silicon Macs, or `Purrplexity-*-x64.dmg` on Intel Macs. Drag Purrplexity to Applications, then open it.
-- **Windows:** run `Purrplexity Setup *.exe`. The guided installer lets the user choose a location and creates Start Menu and Desktop shortcuts. `Purrplexity * portable.exe` runs without installing.
+- **Windows:** run `Purrplexity Setup *.exe` from **1.0.3 or newer** so the in-app Setup guide can save an OpenAI API key. The guided installer lets the user choose a location and creates Start Menu and Desktop shortcuts. `Purrplexity * portable.exe` runs without installing. See [SETUP.md](SETUP.md).
 
 For Windows, always use the file named **Purrplexity Setup … .exe** from the Releases page. It is the guided installer and creates the launcher automatically; the similarly named portable `.exe` does not install shortcuts.
 

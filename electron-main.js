@@ -1,12 +1,28 @@
 import { app, BrowserWindow, shell, ipcMain, safeStorage } from 'electron';
+import electronUpdater from 'electron-updater';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { startServer, stopServer } from './server.js';
 import { createSettingsStore } from './settings-store.js';
+import { createUpdateController } from './update-controller.js';
+
+const { autoUpdater } = electronUpdater;
 
 const appRoot = dirname(fileURLToPath(import.meta.url));
 let window;
 let settings;
+let latestUpdate = null;
+const deliverUpdate = () => {
+  if (!latestUpdate || !window || window.isDestroyed()) return;
+  window.webContents.send('purrplexity:update-status', latestUpdate);
+};
+const updates = createUpdateController({
+  autoUpdater,
+  isPackaged: app.isPackaged,
+  isPortable: process.platform === 'win32' && Boolean(process.env.PORTABLE_EXECUTABLE_FILE),
+  sendStatus: status => { latestUpdate = status; deliverUpdate(); },
+  log: message => console.error(message)
+});
 const createWindow = async () => {
   window = new BrowserWindow({
     width: 1280,
@@ -28,6 +44,7 @@ const createWindow = async () => {
   window.webContents.on('preload-error', (_event, preloadPath, error) => {
     console.error(`Purrplexity could not load the setup bridge (${preloadPath}): ${error?.message || error}`);
   });
+  window.webContents.on('did-finish-load', deliverUpdate);
   try {
     const port = await startServer();
     await window.loadURL(`http://127.0.0.1:${port}`);
@@ -48,8 +65,16 @@ app.whenReady().then(async () => {
       throw new Error(error?.message || 'Could not save the API key on this computer.');
     }
   });
+  ipcMain.handle('purrplexity:install-update', () => {
+    try {
+      updates.install();
+    } catch (error) {
+      throw new Error(error?.message || 'Could not install the update.');
+    }
+  });
   await createWindow();
+  updates.start();
 });
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
 app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });
-app.on('before-quit', () => stopServer());
+app.on('before-quit', () => { updates.stop(); stopServer(); });

@@ -11,9 +11,11 @@ Download the package matching your computer from the repository's **Releases** p
 - **macOS:** open `Purrplexity-*-arm64.dmg` on Apple Silicon Macs, or `Purrplexity-*-x64.dmg` on Intel Macs. Drag Purrplexity to Applications, then open it.
 - **Windows:** run `Purrplexity Setup *.exe` from **1.0.3 or newer** so the in-app Setup guide can save an OpenAI API key. The guided installer lets the user choose a location and creates Start Menu and Desktop shortcuts. `Purrplexity * portable.exe` runs without installing. See [SETUP.md](SETUP.md).
 
-For Windows, always use the file named **Purrplexity Setup … .exe** from the Releases page. It is the guided installer and creates the launcher automatically; the similarly named portable `.exe` does not install shortcuts.
+For Windows, always use the file named **Purrplexity Setup … .exe** from the Releases page. It is the guided installer and creates the launcher automatically; the similarly named portable `.exe` does not install shortcuts. Only the Setup install checks GitHub Releases and can install a newer version. The portable exe does not.
 
-The macOS build is currently unsigned, so macOS may require Control-click → Open the first time. Signing and notarization require an Apple Developer certificate. The Windows installer is also unsigned until a code-signing certificate is supplied.
+After 1.0.3 is installed, the app looks for a newer GitHub Release on launch and about every four hours. It downloads in the background. When an update is ready it asks you to restart, and it will not restart while a question is in progress. Updates do not come from `git pull`, and `npm start` does not check. Nobody needs a GitHub token to receive an update.
+
+The macOS build is currently unsigned, so macOS may require Control-click → Open the first time. Signing and notarization require an Apple Developer certificate, and Mac auto-update cannot reliably replace the app until that exists. The Windows installer is also unsigned until a code-signing certificate is supplied, so SmartScreen or a permission prompt can appear on install and on later updates.
 
 ## Start locally
 
@@ -51,4 +53,4 @@ Run `npm install`, then:
 - macOS: `npm run package:mac`
 - Windows: `npm run package:win` (run this on Windows for the most reliable NSIS installer build)
 
-Packages are written to `release/`. Builds are intentionally not source-control committed; attach them to a GitHub Release so users can download them directly.
+Packages are written to `release/`. Builds are intentionally not source-control committed. Publish them as a GitHub Release on `grummpy/For_Nick` so installed apps can see them. electron-builder writes `latest.yml` for Windows and `latest-mac.yml` for Mac next to the installers; those files, the NSIS setup exe, the Mac zip, and the blockmaps have to be on the release or the in-app updater has nothing to download. A maintainer can upload with `electron-builder --publish always`, which reads `GH_TOKEN` on that machine only. The token is not put in the app, and people who install Purrplexity never set it.

@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "node server.js",
     "start": "electron .",
-    "test": "node --test --test-concurrency=1 settings-store.test.js",
+    "test": "node --test --test-concurrency=1 settings-store.test.js update-controller.test.js",
     "package:mac": "electron-builder --mac dmg zip --arm64 && electron-builder --mac dmg zip --x64",
     "package:win": "electron-builder --win nsis portable --x64",
     "package:all": "npm run package:mac && npm run package:win"
@@ -79,10 +79,18 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "Purrplexity"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "grummpy",
+      "repo": "For_Nick"
     }
   },
   "allowScripts": {
     "electron@39.8.10": true,
     "electron-winstaller@5.4.0": true
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.9"
   }
 }

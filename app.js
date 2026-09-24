@@ -9,17 +9,53 @@ $('#query').oninput = () => setState($('#query').value.trim() ? 'listening' : 'i
 $('#dropzone').ondragover = e => { e.preventDefault(); $('#dropzone').classList.add('over'); }; $('#dropzone').ondragleave = () => $('#dropzone').classList.remove('over'); $('#dropzone').ondrop = e => { e.preventDefault(); $('#dropzone').classList.remove('over'); addFiles(e.dataTransfer.files); };
 $('#queryForm').onsubmit = async e => { e.preventDefault(); const query = $('#query').value.trim(); if (!query) return; $('#conversation').insertAdjacentHTML('beforeend', `<article class="message user">${escapeHtml(query)}</article>`); $('#query').value = ''; setState('searching'); $('.send').disabled = true; try { const res = await fetch('/api/query', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({query, files: files.map(({name,size}) => ({name,size}))}) }); const data = await res.json(); if (!res.ok) throw new Error(data.error); $('#conversation').insertAdjacentHTML('beforeend', `<article class="message answer"><small>${data.demo ? 'DEMO MODE' : 'FIX-IT'}</small>${escapeHtml(data.answer)}</article>`); setState('success'); } catch (err) { $('#conversation').insertAdjacentHTML('beforeend', `<article class="message error">${escapeHtml(err.message)}</article>`); setState('idle'); } finally { $('.send').disabled = false; $('#conversation').scrollTop = $('#conversation').scrollHeight; } };
 $('#voice').onclick = () => { const recognition = window.SpeechRecognition || window.webkitSpeechRecognition; if (!recognition) return alert('Voice input is not available in this browser.'); const r = new recognition(); r.onstart = () => { $('#voice').textContent = '● Listening'; setState('listening'); }; r.onresult = e => { $('#query').value += ( $('#query').value ? ' ' : '') + e.results[0][0].transcript; }; r.onend = () => { $('#voice').textContent = '⌁ Voice'; setState('listening'); }; r.start(); };
+function runningInDesktopApp() { return /\bElectron\b/.test(navigator.userAgent); }
+function formatSetupError(error) {
+  const raw = error && typeof error.message === 'string' ? error.message : '';
+  const cleaned = raw.replace(/^Error invoking remote method '[^']+':\s*/i, '').replace(/^Error:\s*/, '').trim();
+  return cleaned || 'Could not save the API key. Close any other Purrplexity windows and try Save & connect again.';
+}
+function connectionStatus(setup) {
+  if (!setup?.connected) return 'Not connected yet. Add your API key below.';
+  if (setup.protection === 'local') return 'Connected with local encryption because operating-system credential storage is unavailable. You can replace the saved key or update your Vector Store.';
+  return 'Connected. You can replace the saved key or update your Vector Store.';
+}
+function savedMessage(result) {
+  if (result?.protection === 'local') return 'Connected. Operating-system credential storage is unavailable, so the key was encrypted locally in this app\'s data folder. Your next question will use your OpenAI account.';
+  return 'Connected. Your next question will use your OpenAI account.';
+}
 async function showSetup() {
   const guide = $('#guide'); const setupStatus = $('#setupStatus'); const bridge = window.purrplexity;
-  if (!bridge) { setupStatus.textContent = 'Browser development mode: copy .env.example to .env, add your key, then restart.'; $('#setupForm').hidden = true; }
-  else { const setup = await bridge.getSetupStatus(); setupStatus.textContent = setup.connected ? 'Connected. You can replace the saved key or update your Vector Store.' : 'Not connected yet. Add your API key below.'; $('#vectorStoreId').value = setup.vectorStoreId; $('#model').value = setup.model; $('#setupForm').hidden = false; }
-  guide.showModal();
+  $('#setupResult').textContent = '';
+  if (!bridge) {
+    setupStatus.textContent = runningInDesktopApp()
+      ? 'The setup bridge did not load, so the API key field is unavailable. Quit this copy and install Purrplexity 1.0.3 or newer from GitHub Releases (the Setup installer, or the matching portable exe).'
+      : 'Browser development mode: copy .env.example to .env, add your key, then restart.';
+    $('#setupForm').hidden = true;
+  } else {
+    try {
+      const setup = await bridge.getSetupStatus();
+      setupStatus.textContent = connectionStatus(setup);
+      $('#vectorStoreId').value = setup.vectorStoreId || '';
+      $('#model').value = setup.model || 'gpt-5-mini';
+      $('#setupForm').hidden = false;
+    } catch (error) {
+      setupStatus.textContent = 'Could not read the saved connection. Paste your API key and select Save & connect.';
+      $('#setupResult').textContent = formatSetupError(error);
+      $('#setupForm').hidden = false;
+    }
+  }
+  if (!guide.open) guide.showModal();
 }
 $('#setup').onclick = showSetup; $('#closeGuide').onclick = () => $('#guide').close();
 $('#setupForm').onsubmit = async event => {
   event.preventDefault(); const button = $('#saveSetup'); button.disabled = true; $('#setupResult').textContent = 'Saving securely…';
-  try { await window.purrplexity.saveSetup({ apiKey: $('#apiKey').value, vectorStoreId: $('#vectorStoreId').value, model: $('#model').value }); $('#apiKey').value = ''; $('#setupResult').textContent = 'Connected. Your next question will use your OpenAI account.'; $('#route').textContent = 'OpenAI connected'; }
-  catch (error) { $('#setupResult').textContent = error.message; } finally { button.disabled = false; }
+  try {
+    if (!window.purrplexity?.saveSetup) throw new Error('The setup bridge is not available in this window. Install Purrplexity 1.0.3 or newer and open the desktop app.');
+    const result = await window.purrplexity.saveSetup({ apiKey: $('#apiKey').value, vectorStoreId: $('#vectorStoreId').value, model: $('#model').value });
+    $('#apiKey').value = ''; $('#setupStatus').textContent = connectionStatus(result); $('#setupResult').textContent = savedMessage(result); $('#route').textContent = 'OpenAI connected';
+  } catch (error) { $('#setupResult').textContent = formatSetupError(error); } finally { button.disabled = false; }
 };
 function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; } drawFiles();
-if (window.purrplexity) window.purrplexity.getSetupStatus().then(setup => { if (!setup.connected) setTimeout(showSetup, 250); }).catch(() => {});
+if (window.purrplexity) window.purrplexity.getSetupStatus().then(setup => { if (!setup.connected) setTimeout(showSetup, 250); }).catch(() => setTimeout(showSetup, 250));
+else if (runningInDesktopApp()) setTimeout(showSetup, 250);

@@ -1,14 +1,63 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>For Nick</title><link rel="stylesheet" href="styles.css"></head>
-<body><main class="app">
-  <header><div class="brand"><span class="dot"></span><div><small>PERSONAL AI WORKSPACE</small><strong>FOR NICK</strong></div></div><button id="setup">Setup guide</button></header>
-  <div class="layout">
-    <aside><div class="segmented"><button class="active" data-view="companion">Companion</button><button data-view="files">Files</button></div>
-      <section id="companion"><div class="avatar"><img id="avatar" src="assets/avatar/idle.png" alt="A friendly cat assistant ready to help"><span id="status">Ready when you are</span></div><small class="eyebrow">YOUR QUERY COMPANION</small><h1>Fix-It</h1><p>A calm, file-aware assistant. It listens while you type, researches while it works, and celebrates a useful result.</p><div class="states"><span>● Listening</span><span>● Searching</span><span>● Ready</span></div></section>
-      <section id="files" hidden><button class="new-file" id="addFiles">＋ Add files</button><input id="fileInput" type="file" multiple hidden><p class="hint">Drop a file in the center, or add it here. Connect it to OpenAI during setup to make it searchable.</p><div id="fileList"></div></section>
-    </aside>
-    <section class="workspace"><div class="route"><span><i></i> <b id="route">OpenAI workspace</b></span><button id="voice" aria-pressed="false">⌁ Voice</button></div><div id="conversation" aria-live="polite"><article class="welcome"><small>ASK ANYTHING</small><h2>What can we figure out?</h2><p>Type, talk, or drop in a file. Your query goes to your configured OpenAI knowledge assistant.</p></article></div>
-      <form id="queryForm"><div id="dropzone"><textarea id="query" placeholder="Ask a question, paste a brief, or drop in a file…" rows="4"></textarea><div id="pendingFiles"></div></div><div class="actions"><span>Enter to send · Shift+Enter for a new line</span><button class="send" type="submit">Ask Fix-It ↗</button></div></form>
-    </section>
-  </div>
-</main><dialog id="guide"><button class="close" id="closeGuide">×</button><small>FIVE-MINUTE SETUP</small><h2>Connect your OpenAI assistant</h2><ol><li>Copy <code>.env.example</code> to <code>.env</code>.</li><li>Add an API key from platform.openai.com.</li><li>Optional: create a Vector Store, upload your source files, then add its ID as <code>OPENAI_VECTOR_STORE_ID</code>.</li><li>Run <code>npm run dev</code> and open the local address.</li></ol><p>Your key stays on your machine and is never sent to the browser. Full details are in the README.</p></dialog><script src="app.js"></script></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>For Nick</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div class="brand"><span class="dot"></span><div><small>LOCAL DRAFT + MANUAL HANDOFF</small><strong>FOR NICK</strong></div></div>
+      <button id="setup">How this stays local</button>
+    </header>
+    <div class="layout">
+      <aside>
+        <div class="segmented"><button class="active" data-view="companion">Companion</button><button data-view="files">Files</button></div>
+        <section id="companion">
+          <div class="avatar"><img id="avatar" src="assets/avatar/idle.png" alt="A friendly cat companion ready beside a local draft"><span id="status">Local draft ready</span></div>
+          <small class="eyebrow">YOUR LOCAL DRAFT COMPANION</small>
+          <h1>Fix-It</h1>
+          <p>Draft here, then explicitly copy your text or open GUMBUS in your normal browser. This app does not send prompts or files anywhere.</p>
+          <div class="states"><span>● Draft locally</span><span>● Copy explicitly</span><span>● Paste where you choose</span></div>
+        </section>
+        <section id="files" hidden>
+          <button class="new-file" id="addFiles">＋ List local files</button>
+          <input id="fileInput" type="file" multiple hidden>
+          <p class="hint">This is a local attachment checklist. Listed files are not uploaded, opened, or read by this app.</p>
+          <div id="fileList"></div>
+          <button id="clearFiles">Clear local list</button>
+        </section>
+      </aside>
+      <section class="workspace">
+        <div class="route">
+          <span><i></i> <b id="route">Local draft — manual handoff only</b></span>
+          <div class="route-actions"><a id="openGumbus" href="https://chatgpt.com/g/g-6a3b127bd4c88191a2c0f8f3673bb106-gumbus" target="_blank" rel="noopener noreferrer">Open GUMBUS</a><button id="clearDraft" type="button">Clear draft</button></div>
+        </div>
+        <div id="conversation" aria-live="polite">
+          <article class="welcome"><small>START WITH A LOCAL DRAFT</small><h2>What can we work out?</h2><p>Nothing leaves this app until you explicitly copy your draft or open GUMBUS. Opening GUMBUS never puts your prompt or file names in the URL.</p></article>
+        </div>
+        <form id="queryForm">
+          <div id="dropzone"><textarea id="query" placeholder="Draft a question, a brief, or notes to copy…" rows="4"></textarea><div id="pendingFiles"></div></div>
+          <p id="privacyNotice" class="privacy" role="status"></p>
+          <div class="actions"><span>Enter copies locally · Shift+Enter starts a new line</span><button class="send" type="submit">Copy draft</button></div>
+        </form>
+      </section>
+    </div>
+  </main>
+  <dialog id="guide">
+    <button class="close" id="closeGuide">×</button>
+    <small>LOCAL-ONLY HANDOFF</small>
+    <h2>How this stays local</h2>
+    <ol>
+      <li>Draft text and the optional file checklist stay in this app.</li>
+      <li>Use <strong>Copy draft</strong> only when you are ready to paste elsewhere.</li>
+      <li>Use <strong>Open GUMBUS</strong> to open the normal browser page; it does not sign in or submit a prompt.</li>
+      <li>Review local privacy warnings before copying sensitive student information. They are pattern hints, not legal or privacy certification.</li>
+    </ol>
+    <p>This app makes no Responses API call and does not upload or read selected files.</p>
+  </dialog>
+  <script src="app.js"></script>
+</body>
+</html>

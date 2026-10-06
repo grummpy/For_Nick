@@ -8,11 +8,12 @@
   "scripts": {
     "dev": "node server.js",
     "start": "electron .",
+    "test": "node --test tests/*.test.js",
     "package:mac": "electron-builder --mac dmg zip --arm64 && electron-builder --mac dmg zip --x64",
     "package:win": "electron-builder --win nsis portable --x64",
     "package:all": "npm run package:mac && npm run package:win"
   },
-  "description": "Purrplexity: a calm, file-aware OpenAI query workspace with a responsive cat companion.",
+  "description": "Purrplexity: a local draft and manual GUMBUS handoff with a responsive cat companion.",
   "devDependencies": {
     "electron": "^39.2.7",
     "electron-builder": "^26.0.12",

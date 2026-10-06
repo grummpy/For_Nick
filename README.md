@@ -1,52 +1,59 @@
 # Purrplexity (For Nick)
 
-A deliberately simple, personal OpenAI query workspace with a responsive cat companion. “Purrplexity” takes a typed, spoken, or file-supported question and sends it to the [OpenAI Responses API](https://platform.openai.com/docs/api-reference/responses).
+A deliberately simple local drafting companion. Purrplexity keeps drafts and an
+optional local file checklist on the device, then lets Nick explicitly copy a
+draft or open GUMBUS in the normal browser. It does not call the Responses API.
 
 ## Install the desktop app
 
-Download the package matching your computer from the repository's **Releases** page.
+Download the package matching the computer from the repository Releases page.
 
-- **macOS:** open `Purrplexity-*-arm64.dmg` on Apple Silicon Macs, or `Purrplexity-*-x64.dmg` on Intel Macs. Drag Purrplexity to Applications, then open it.
-- **Windows:** run `Purrplexity Setup *.exe`. The guided installer lets the user choose a location and creates Start Menu and Desktop shortcuts. `Purrplexity * portable.exe` runs without installing.
+- macOS: open the matching arm64 or x64 DMG, drag Purrplexity to Applications,
+  then open it.
+- Windows: run Purrplexity Setup. The guided installer creates Start Menu and
+  Desktop shortcuts. The portable EXE runs without installation.
 
-For Windows, always use the file named **Purrplexity Setup … .exe** from the Releases page. It is the guided installer and creates the launcher automatically; the similarly named portable `.exe` does not install shortcuts.
-
-The macOS build is currently unsigned, so macOS may require Control-click → Open the first time. Signing and notarization require an Apple Developer certificate. The Windows installer is also unsigned until a code-signing certificate is supplied.
+The macOS and Windows builds are unsigned until signing certificates are
+supplied.
 
 ## Start locally
 
 1. Install Node.js 20 or newer.
-2. Copy `.env.example` to `.env` and add `OPENAI_API_KEY`.
-3. Run `npm run dev` for browser development or `npm start` to open the desktop app.
+2. Run npm run dev for browser development or npm start for the desktop app.
+3. Draft locally. Choose Copy draft only when ready to paste elsewhere, or
+   choose Open GUMBUS to open the destination in the normal browser.
 
-Without an API key, the app runs in safe demo mode so the UI can be evaluated without sending anything.
+No API key, platform setup, account automation, or file upload is required. The
+app never reads selected file contents; the Files panel is a local checklist so
+Nick can remember what to attach manually. The destination opens without
+putting prompt text or file names in its URL.
 
-## Make a file-aware assistant
-
-1. In the OpenAI platform, create a Vector Store and upload the documents that should answer questions.
-2. Copy its ID into `OPENAI_VECTOR_STORE_ID` in `.env`.
-3. Restart the app. Each query now includes OpenAI's `file_search` tool against that knowledge collection.
-
-The file picker and drop zone currently stage filenames in the interface. Uploading new local files into OpenAI's Vector Store is intentionally a separate setup action, so the user explicitly chooses what leaves the device.
+Local pattern warnings can flag common email, phone, labeled-name, and student
+identifier forms before copy/open. They are prompts for human review, not a
+guarantee of privacy or legal compliance.
 
 ## Interaction visual states
 
-- `assets/avatar/idle.png` — supplied reference / ready
-- `assets/avatar/listening.png` — typing and voice capture
-- `assets/avatar/searching.png` — request in progress
-- `assets/avatar/success.png` — reply received
+- assets/avatar/idle.png — supplied reference / ready
+- assets/avatar/listening.png — local drafting
+- assets/avatar/searching.png — retained legacy art; no request is made
+- assets/avatar/success.png — draft copied or browser opened
 
-The three generated state assets were made with OpenAI image generation using the supplied cat as the continuity reference.
+The state assets were made with OpenAI image generation using the supplied cat
+as a continuity reference.
 
 ## Architecture
 
-The browser only talks to the local Node server. The server holds the API key and makes the OpenAI request; no secret is embedded in the client.
+The browser talks only to a loopback Node server that serves the static UI. It
+has no query API route, credential loading, provider call, or file upload path.
+Opening GUMBUS is a normal-browser action initiated by Nick.
 
 ## Build installers
 
-Run `npm install`, then:
+Run npm install, then:
 
-- macOS: `npm run package:mac`
-- Windows: `npm run package:win` (run this on Windows for the most reliable NSIS installer build)
+- macOS: npm run package:mac
+- Windows: npm run package:win
 
-Packages are written to `release/`. Builds are intentionally not source-control committed; attach them to a GitHub Release so users can download them directly.
+Packages are written to release. Builds are intentionally not source-control
+committed; attach them to a GitHub Release only after separate release review.
